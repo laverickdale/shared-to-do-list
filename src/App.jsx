@@ -478,7 +478,7 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
             </button>
           </div>
 
-          <form onSubmit={submit} className="space-y-5 overflow-y-auto px-5 py-5 sm:px-6">
+          <form onSubmit={submit} className="space-y-5 overflow-y-auto px-5 py-5 pb-6 sm:px-6">
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">Task title</label>
               <input
@@ -567,46 +567,48 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Notes</label>
-              <textarea
-                value={form.notes}
-                onChange={(e) => updateField("notes", e.target.value)}
-                placeholder="Add job details, follow-ups, material notes, access times, or reminders"
-                rows={3}
-                className="w-full min-h-[96px] max-h-40 resize-none overflow-y-auto rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900 sm:min-h-[120px]"
-              />
-            </div>
+           <div>
+  <label className="mb-2 block text-sm font-medium text-slate-700">Notes</label>
+  <textarea
+    value={form.notes}
+    onChange={(e) => updateField("notes", e.target.value)}
+    placeholder="Add job details, follow-ups, material notes, access times, or reminders"
+    rows={3}
+    className="w-full min-h-[96px] max-h-40 resize-none overflow-y-auto rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900 sm:min-h-[120px]"
+  />
+</div>
 
-            <div className="sticky bottom-0 -mx-5 border-t border-slate-200 bg-white px-5 pt-4 pb-3 sm:-mx-6 sm:px-6">
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
-                <div>
-                  {isEdit ? (
-                    <button
-                      type="button"
-                      onClick={() => onDelete(form.id)}
-                      className="inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
-                  >
-                    {isEdit ? "Save changes" : "Add task"}
-                  </button>
-                </div>
-              </div>
+<div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:justify-between">
+  <div>
+    {isEdit ? (
+      <button
+        type="button"
+        onClick={() => onDelete(form.id)}
+        className="inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
+      >
+        <Trash2 className="h-4 w-4" />
+        Delete
+      </button>
+    ) : null}
+  </div>
+
+  <div className="flex gap-3">
+    <button
+      type="button"
+      onClick={onClose}
+      className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+    >
+      {isEdit ? "Save changes" : "Add task"}
+    </button>
+  </div>
+</div>
             </div>
           </form>
         </motion.div>
