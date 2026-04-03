@@ -452,16 +452,16 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 p-3 sm:items-center sm:p-6"
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 sm:items-center sm:p-6"
       >
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 30, opacity: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
-          className="max-h-[92vh] w-full max-w-xl overflow-hidden rounded-[28px] bg-white shadow-2xl"
+          className="flex h-[100dvh] w-full flex-col overflow-hidden bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-xl sm:rounded-[28px]"
         >
-          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 sm:px-6">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 sm:px-6">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
                 {isEdit ? "Edit task" : "New task"}
@@ -478,137 +478,135 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
             </button>
           </div>
 
-          <form onSubmit={submit} className="space-y-5 overflow-y-auto px-5 py-5 pb-6 sm:px-6">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Task title</label>
-              <input
-                value={form.title}
-                onChange={(e) => updateField("title", e.target.value)}
-                placeholder="Enter task"
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900"
-              />
-              <div className="mt-3 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={toggleVoiceInput}
-                  disabled={!voiceSupported && !isListening}
-                  className={classNames(
-                    "inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium transition",
-                    isListening
-                      ? "bg-rose-100 text-rose-700"
-                      : "bg-slate-900 text-white hover:bg-slate-800",
-                    !voiceSupported && !isListening ? "cursor-not-allowed opacity-60" : ""
-                  )}
-                >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  {isListening ? "Stop listening" : "Add by voice"}
-                </button>
-                <div className="flex items-center text-sm text-slate-500">
+          <form onSubmit={submit} className="flex-1 overflow-y-auto px-4 py-4 pb-6 sm:px-6 sm:py-5">
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Task title</label>
+                <input
+                  value={form.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                  placeholder="Enter task"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                />
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={toggleVoiceInput}
+                    disabled={!voiceSupported && !isListening}
+                    className={classNames(
+                      "inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition",
+                      isListening
+                        ? "bg-rose-100 text-rose-700"
+                        : "bg-slate-900 text-white hover:bg-slate-800",
+                      !voiceSupported && !isListening ? "cursor-not-allowed opacity-60" : ""
+                    )}
+                  >
+                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    {isListening ? "Stop listening" : "Add by voice"}
+                  </button>
+                </div>
+                <p className="mt-3 text-sm text-slate-500">
                   Example: “Call Mick about the site tomorrow, high priority”
+                </p>
+                {voiceError ? <p className="mt-2 text-sm text-rose-600">{voiceError}</p> : null}
+                {!voiceSupported ? (
+                  <p className="mt-2 text-sm text-slate-500">
+                    Voice entry is not supported in this browser preview.
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Responsible</label>
+                  <select
+                    value={form.owner}
+                    onChange={(e) => updateField("owner", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  >
+                    <option>Dale</option>
+                    <option>Mick</option>
+                    <option>Unassigned</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Due date</label>
+                  <input
+                    type="date"
+                    value={form.due_date}
+                    onChange={(e) => updateField("due_date", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  />
                 </div>
               </div>
-              {voiceError ? <p className="mt-3 text-sm text-rose-600">{voiceError}</p> : null}
-              {!voiceSupported ? (
-                <p className="mt-3 text-sm text-slate-500">
-                  Voice entry is not supported in this browser preview.
-                </p>
-              ) : null}
-            </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Responsible</label>
-                <select
-                  value={form.owner}
-                  onChange={(e) => updateField("owner", e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900"
-                >
-                  <option>Dale</option>
-                  <option>Mick</option>
-                  <option>Unassigned</option>
-                </select>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Status</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => updateField("status", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  >
+                    <option>To Do</option>
+                    <option>In Progress</option>
+                    <option>Done</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Priority</label>
+                  <select
+                    value={form.priority}
+                    onChange={(e) => updateField("priority", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  >
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                  </select>
+                </div>
               </div>
+
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Due date</label>
-                <input
-                  type="date"
-                  value={form.due_date}
-                  onChange={(e) => updateField("due_date", e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900"
+                <label className="mb-2 block text-sm font-medium text-slate-700">Notes</label>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => updateField("notes", e.target.value)}
+                  placeholder="Add job details, follow-ups, material notes, access times, or reminders"
+                  rows={2}
+                  className="w-full min-h-[80px] max-h-32 resize-none overflow-y-auto rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Status</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => updateField("status", e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900"
-                >
-                  <option>To Do</option>
-                  <option>In Progress</option>
-                  <option>Done</option>
-                </select>
+              <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:justify-between">
+                <div>
+                  {isEdit ? (
+                    <button
+                      type="button"
+                      onClick={() => onDelete(form.id)}
+                      className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
+                  ) : null}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-2xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+                  >
+                    {isEdit ? "Save changes" : "Add task"}
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Priority</label>
-                <select
-                  value={form.priority}
-                  onChange={(e) => updateField("priority", e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900"
-                >
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-           <div>
-  <label className="mb-2 block text-sm font-medium text-slate-700">Notes</label>
-  <textarea
-    value={form.notes}
-    onChange={(e) => updateField("notes", e.target.value)}
-    placeholder="Add job details, follow-ups, material notes, access times, or reminders"
-    rows={3}
-    className="w-full min-h-[96px] max-h-40 resize-none overflow-y-auto rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900 sm:min-h-[120px]"
-  />
-</div>
-
-<div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:justify-between">
-  <div>
-    {isEdit ? (
-      <button
-        type="button"
-        onClick={() => onDelete(form.id)}
-        className="inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
-      >
-        <Trash2 className="h-4 w-4" />
-        Delete
-      </button>
-    ) : null}
-  </div>
-
-  <div className="flex gap-3">
-    <button
-      type="button"
-      onClick={onClose}
-      className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-    >
-      Cancel
-    </button>
-
-    <button
-      type="submit"
-      className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
-    >
-      {isEdit ? "Save changes" : "Add task"}
-    </button>
-  </div>
-</div>
             </div>
           </form>
         </motion.div>
