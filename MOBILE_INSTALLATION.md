@@ -1,6 +1,6 @@
 # 📱 How to Install Dale & Mick Tasks on Your Phone
 
-This guide will help you install the **Dale & Mick Tasks** app on your Android or iOS phone in simple steps. No coding knowledge needed!
+This guide will help you install the **LavTask** app on your Android or iOS phone in simple steps. No coding knowledge needed!
 
 ---
 
