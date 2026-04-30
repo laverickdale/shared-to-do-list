@@ -52,6 +52,7 @@ import {
 const ownerStyles = {
   Dale: { chip: "bg-sky-100 text-sky-700 border-sky-200" },
   Mick: { chip: "bg-amber-100 text-amber-700 border-amber-200" },
+  Mark: { chip: "bg-green-100 text-green-700 border-green-200" },
   Unassigned: { chip: "bg-slate-100 text-slate-700 border-slate-200" }
 };
 
@@ -152,7 +153,7 @@ function SetupPanel({ open, onToggle, config, onConfigChange, onSaveConfig, sync
   const [copied, setCopied] = useState(false);
   const sql = `create table if not exists public.tasks (
   id text primary key,
-  workspace text not null default 'dale-mick',
+  workspace text not null default 'lav-task',
   title text not null,
   owner text not null default 'Unassigned',
   status text not null default 'To Do',
@@ -168,26 +169,26 @@ alter table public.tasks enable row level security;
 do $$ begin
   create policy "Allow read tasks" on public.tasks
   for select to anon
-  using (workspace = 'dale-mick');
+  using (workspace = 'lav-task');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
   create policy "Allow insert tasks" on public.tasks
   for insert to anon
-  with check (workspace = 'dale-mick');
+  with check (workspace = 'lav-task');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
   create policy "Allow update tasks" on public.tasks
   for update to anon
-  using (workspace = 'dale-mick')
-  with check (workspace = 'dale-mick');
+  using (workspace = 'lav-task')
+  with check (workspace = 'lav-task');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
   create policy "Allow delete tasks" on public.tasks
   for delete to anon
-  using (workspace = 'dale-mick');
+  using (workspace = 'lav-task');
 exception when duplicate_object then null; end $$;`;
 
   async function copySql() {
@@ -206,7 +207,7 @@ exception when duplicate_object then null; end $$;`;
         <div>
           <h3 className="text-lg font-semibold text-slate-900">Shared sync setup</h3>
           <p className="mt-1 text-sm leading-6 text-slate-500">
-            Connect Supabase once and both phones can see live updates instantly.
+            Connect Supabase once and all phones can see live updates instantly.
           </p>
         </div>
         <div className="rounded-2xl bg-slate-100 p-2 text-slate-700">
@@ -221,11 +222,11 @@ exception when duplicate_object then null; end $$;`;
               <div className="grid gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Supabase project URL</label>
-                  <input value={config.supabaseUrl} onChange={(e) => onConfigChange("supabaseUrl", e.target.value)} placeholder="https://your-project.supabase.co" className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-base outline-none transition focus:border-slate-900" />
+                  <input value={config.supabaseUrl} onChange={(e) => onConfigChange("supabaseUrl", e.target.value)} placeholder="https://your-project.supabase.co" className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900" />
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Supabase anon key</label>
-                  <textarea value={config.supabaseAnonKey} onChange={(e) => onConfigChange("supabaseAnonKey", e.target.value)} placeholder="Paste anon public key" rows={4} className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900" />
+                  <textarea value={config.supabaseAnonKey} onChange={(e) => onConfigChange("supabaseAnonKey", e.target.value)} placeholder="Paste anon public key" rows={4} className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900" />
                 </div>
               </div>
 
@@ -235,7 +236,7 @@ exception when duplicate_object then null; end $$;`;
                   Save and connect
                 </button>
                 {syncEnabled ? (
-                  <button onClick={onSeedCloud} disabled={seeding} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 disabled:opacity-60">
+                  <button onClick={onSeedCloud} disabled={seeding} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 disabled:opacity-50">
                     <RefreshCw className={classNames("h-4 w-4", seeding ? "animate-spin" : "")} />
                     Seed cloud with current tasks
                   </button>
@@ -247,7 +248,7 @@ exception when duplicate_object then null; end $$;`;
                   {connectionState === "connected" ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
                   Connection status: {connectionState}
                 </div>
-                <p className="mt-2">In local mode the app still works on one phone. Once connected, tasks sync live across Dale and Mick’s phones using the same database.</p>
+                <p className="mt-2">In local mode the app still works on one phone. Once connected, tasks sync live across all phones using the same database.</p>
                 {syncMessage ? <p className="mt-2 text-slate-700">{syncMessage}</p> : null}
               </div>
 
@@ -506,7 +507,7 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
                   </button>
                 </div>
                 <p className="mt-3 text-sm text-slate-500">
-                  Example: “Call Mick about the site tomorrow, high priority”
+                  Example: "Call Mark about the site tomorrow, high priority"
                 </p>
                 {voiceError ? <p className="mt-2 text-sm text-rose-600">{voiceError}</p> : null}
                 {!voiceSupported ? (
@@ -526,6 +527,7 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
                   >
                     <option>Dale</option>
                     <option>Mick</option>
+                    <option>Mark</option>
                     <option>Unassigned</option>
                   </select>
                 </div>
@@ -623,7 +625,7 @@ function TaskCard({ task, onEdit, onQuickStatus }) {
   const isOverdue = task.status !== "Done" && days !== null && days < 0;
 
   return (
-    <motion.button layout onClick={() => onEdit(task)} className={classNames("w-full rounded-[28px] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md", isOverdue ? "border-rose-200" : "border-slate-200")}>
+    <motion.button layout onClick={() => onEdit(task)} className={classNames("w-full rounded-[28px] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md", isOverdue && "border-rose-200 bg-rose-50")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -659,9 +661,9 @@ function TaskCard({ task, onEdit, onQuickStatus }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
-        {task.status !== "To Do" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "To Do"); }} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">Move to To Do</button> : null}
-        {task.status !== "In Progress" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "In Progress"); }} className="rounded-full bg-violet-100 px-3 py-1.5 text-xs font-medium text-violet-700 transition hover:bg-violet-200">Start task</button> : null}
-        {task.status !== "Done" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "Done"); }} className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-200">Mark done</button> : null}
+        {task.status !== "To Do" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "To Do"); }} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">To Do</button> : null}
+        {task.status !== "In Progress" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "In Progress"); }} className="rounded-full bg-violet-100 px-3 py-1.5 text-xs font-medium text-violet-700 transition hover:bg-violet-200">In Progress</button> : null}
+        {task.status !== "Done" ? <button onClick={(e) => { e.stopPropagation(); onQuickStatus(task.id, "Done"); }} className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-200">Done</button> : null}
       </div>
     </motion.button>
   );
@@ -675,7 +677,7 @@ function runSelfTests() {
   }
   function assert(condition, message) { if (!condition) throw new Error(message); }
   test("starter tasks include two tasks", () => { const starter = makeStarterTasks(); assert(starter.length === 2, "Expected two starter tasks"); });
-  test("validateSupabaseConfig accepts valid looking config", () => { const result = validateSupabaseConfig("https://example.supabase.co", "public-anon-key"); assert(result.ok === true, "Expected valid-looking config to pass"); });
+  test("validateSupabaseConfig accepts valid looking config", () => { const result = validateSupabaseConfig("https://example.supabase.co", "public-anon-key"); assert(result.ok === true, "Expected valid config"); });
   return results;
 }
 
@@ -797,7 +799,7 @@ export default function App() {
       if (channelRef.current && client.removeChannel) client.removeChannel(channelRef.current);
 
       if (client.channel) {
-        const channel = client.channel("dale-mick-tasks-live").on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `workspace=eq.${WORKSPACE}` }, async () => {
+        const channel = client.channel("lav-task-live").on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `workspace=eq.${WORKSPACE}` }, async () => {
           try { await refreshTasksFromCloud(client); }
           catch (refreshError) { setSyncMessage(refreshError?.message ? `Connected, but refresh failed: ${refreshError.message}` : "Connected, but refresh failed."); }
         }).subscribe((status) => { if (status === "SUBSCRIBED") setConnectionState("connected"); });
@@ -818,7 +820,7 @@ export default function App() {
 
   async function pushTaskToCloud(task) {
     if (!supabaseRef.current) return;
-    const payload = { id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "", created_at: task.created_at, updated_at: task.updated_at || new Date().toISOString() };
+    const payload = { id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "" };
     const { error } = await supabaseRef.current.from("tasks").upsert(payload);
     if (error) throw error;
   }
@@ -833,7 +835,7 @@ export default function App() {
     if (!supabaseRef.current) { setSyncMessage("Connect to Supabase first, then seed the cloud with current tasks."); return; }
     try {
       setSeeding(true);
-      const payload = tasks.map((task) => ({ id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "", created_at: task.created_at, updated_at: task.updated_at || new Date().toISOString() }));
+      const payload = tasks.map((task) => ({ id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "" }));
       const { error } = await supabaseRef.current.from("tasks").upsert(payload);
       if (error) throw error;
       setSyncMessage("Cloud seed completed.");
@@ -918,15 +920,15 @@ export default function App() {
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 pb-28 pt-5 sm:px-6 lg:px-8">
         <div className="mb-5 overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-xl">
-          <div className="bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)] px-5 py-6 sm:px-7 sm:py-8">
+          <div className="bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)] px-5 py-6 sm:px-6">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-300">Shared mobile app</p>
-                <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Dale & Mick Tasks</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">Built as a cleaner mobile task app with local-first behaviour, optional cloud sync, quick edits, and owner colour coding.</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">LavTask</h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">Built as a cleaner mobile task app with local-first behaviour, optional cloud sync, quick edits, and ownership tracking for Dale, Mick, and Mark.</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <div className={classNames("inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium", syncEnabled ? "bg-emerald-500/20 text-emerald-100" : "bg-white/10 text-slate-200")}>
+                <div className={classNames("inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium", syncEnabled ? "bg-emerald-500/20 text-emerald-100" : "bg-white/10 text-slate-300")}>
                   {syncEnabled ? <Cloud className="h-4 w-4" /> : <CloudOff className="h-4 w-4" />}
                   {syncEnabled ? "Live sync ready" : "Local mode"}
                 </div>
@@ -970,7 +972,7 @@ export default function App() {
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search tasks or notes" className="w-full rounded-2xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-base outline-none transition focus:border-slate-900" />
             </div>
-            <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={ownerFilter} onChange={setOwnerFilter} options={["All", "Dale", "Mick"]} /></div>
+            <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={ownerFilter} onChange={setOwnerFilter} options={["All", "Dale", "Mick", "Mark"]} /></div>
             <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={statusFilter} onChange={setStatusFilter} options={["All", "To Do", "In Progress", "Done"]} /></div>
             <div className="flex items-center gap-2 rounded-2xl border border-slate-300 px-3 py-3 text-sm text-slate-600">
               <ArrowUpDown className="h-4 w-4" />
@@ -998,7 +1000,7 @@ export default function App() {
             </div>
 
             <AnimatePresence mode="popLayout">
-              {filteredTasks.length ? filteredTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onQuickStatus={handleQuickStatus} />) : <EmptyState onAdd={() => openNewTask(false)} />}
+              {filteredTasks.length ? filteredTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onQuickStatus={handleQuickStatus} />) : <EmptyState onAdd={() => openNewTask()} />}
             </AnimatePresence>
           </div>
 
@@ -1018,15 +1020,19 @@ export default function App() {
                   <div><p className="font-medium text-slate-900">Mick</p><p className="text-sm text-slate-600">Amber owner tags</p></div>
                   <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white">Owner</span>
                 </div>
+                <div className="flex items-center justify-between rounded-2xl bg-green-50 px-4 py-3">
+                  <div><p className="font-medium text-slate-900">Mark</p><p className="text-sm text-slate-600">Green owner tags</p></div>
+                  <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-medium text-white">Owner</span>
+                </div>
               </div>
             </div>
 
             <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900">Useful touches built in</h3>
               <div className="mt-4 space-y-3 text-sm text-slate-600">
-                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><StickyNote className="mt-0.5 h-4 w-4 text-slate-500" /><p>Every task includes notes for materials, access times, phone calls, and reminders.</p></div>
+                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><StickyNote className="mt-0.5 h-4 w-4 text-slate-500" /><p>Every task includes notes for materials, access times, and follow-ups.</p></div>
                 <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><CalendarDays className="mt-0.5 h-4 w-4 text-slate-500" /><p>Due dates automatically show what is due today, upcoming, or overdue.</p></div>
-                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><RefreshCw className="mt-0.5 h-4 w-4 text-slate-500" /><p>The app runs in local mode first, so Supabase problems do not stop the main task app from loading.</p></div>
+                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><RefreshCw className="mt-0.5 h-4 w-4 text-slate-500" /><p>The app runs in local mode first, so Supabase problems don't block your workflow.</p></div>
               </div>
             </div>
           </div>
@@ -1035,7 +1041,7 @@ export default function App() {
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => openNewTask(true)} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm font-medium text-slate-900">
+          <button onClick={() => openNewTask(true)} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm font-medium text-slate-700">
             <Mic className="h-4 w-4" />
             Voice task
           </button>
