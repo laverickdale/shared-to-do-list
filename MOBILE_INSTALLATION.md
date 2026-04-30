@@ -68,7 +68,7 @@ This guide will help you install the **LavTask** app on your Android or iOS phon
 
 ### Step 5: Find Your App
 1. Go back to your home screen
-2. Look for the icon labeled **"Dale & Mick Tasks"** or **"Tasks"**
+2. Look for the icon labeled **"LavTask"** or **"Tasks"**
 3. Tap it to open the app!
 
 ---
@@ -98,7 +98,7 @@ Once you've installed the app:
 
 ### "Voice task doesn't work"
 - Make sure you've allowed microphone access when the app asked
-- Go to Settings → Apps → Dale & Mick Tasks → Permissions → Microphone (Android)
+- Go to Settings → Apps → LavTasks → Permissions → Microphone (Android)
 - Go to Settings → Safari → Microphone (iOS)
 
 ### "I want to sync with others"
@@ -119,5 +119,3 @@ If something isn't working:
 For technical support, visit the main README or contact the app administrator.
 
 ---
-
-**Enjoy your new task app!** ✨
