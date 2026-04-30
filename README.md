@@ -1,6 +1,7 @@
-# Dale & Mick Tasks
+````markdown
+# LavTask
 
-A mobile-first shared task app built with React, Vite, Tailwind CSS, Framer Motion, and optional Supabase live sync.
+A mobile-first shared task app built with React, Vite, Tailwind CSS, Framer Motion, and optional Supabase live sync for Dale, Mick, and Mark.
 
 ## Local run
 
@@ -44,4 +45,5 @@ After deployment, open **Shared sync setup**, copy the SQL, run it in Supabase S
 
 ## Voice task entry
 
-This build includes speech-to-text task creation. On a supported mobile browser, tap **Voice task**, allow microphone access, and say something like: `Call Mick about the site tomorrow, high priority`. The app will try to fill in the title, owner, priority, due date, and will store the full spoken text in notes.
+This build includes speech-to-text task creation. On a supported mobile browser, tap **Voice task**, allow microphone access, and say something like: `Call Mark about the site tomorrow, high priority`
+````
