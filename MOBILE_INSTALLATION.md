@@ -1,4 +1,4 @@
-# 📱 How to Install Dale & Mick Tasks on Your Phone
+# 📱 How to Install LavTask on Your Phone
 
 This guide will help you install the **LavTask** app on your Android or iOS phone in simple steps. No coding knowledge needed!
 
@@ -34,7 +34,7 @@ This guide will help you install the **LavTask** app on your Android or iOS phon
 
 ### Step 4: Find Your App
 1. Look at your home screen or app drawer (usually at the bottom of your screen)
-2. Find the icon labeled **"Dale & Mick Tasks"** or **"Tasks"**
+2. Find the icon labeled **"LavTask"** or **"Tasks"**
 3. Tap it to open the app!
 
 ### Step 5: (Optional) Pin to Home Screen
