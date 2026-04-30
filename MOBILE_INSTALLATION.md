@@ -19,8 +19,7 @@ This guide will help you install the **Dale & Mick Tasks** app on your Android o
 2. Tap the address bar at the top
 
 ### Step 2: Go to the App Website
-1. Type or paste this address: **[your deployed URL here]**
-   - Example: `https://your-app-name.vercel.app`
+1. Type or paste this address: https://shared-to-do-list-psi.vercel.app/
 2. Press "Go" or tap the search button
 3. Wait for the page to load completely
 
@@ -53,8 +52,7 @@ This guide will help you install the **Dale & Mick Tasks** app on your Android o
 
 ### Step 2: Go to the App Website
 1. Tap the address bar at the bottom of the screen
-2. Type or paste this address: **[your deployed URL here]**
-   - Example: `https://your-app-name.vercel.app`
+2. Type or paste this address: https://shared-to-do-list-psi.vercel.app/
 3. Press "Go"
 4. Wait for the page to load completely
 
