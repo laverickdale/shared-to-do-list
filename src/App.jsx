@@ -51,6 +51,7 @@ import {
   parseVoiceTask
 } from "./lib/taskUtils.js";
 import Planner from "./components/Planner.jsx";
+import Capture from "./components/Capture.jsx";
 
 const ownerStyles = {
   Dale: { chip: "bg-sky-100 text-sky-700 border-sky-200" },
@@ -976,6 +977,15 @@ export default function App() {
     return { overdue, today, open, done };
   }, [tasks]);
 
+  // Get recent tasks for Capture page (last 5 created/updated)
+  const recentTasks = useMemo(() => {
+    return [...tasks].sort((a, b) => {
+      const dateA = new Date(a.updated_at || a.created_at || 0);
+      const dateB = new Date(b.updated_at || b.created_at || 0);
+      return dateB - dateA;
+    }).slice(0, 5);
+  }, [tasks]);
+
   // Planner view
   if (currentTab === "planner") {
     return (
@@ -1010,21 +1020,16 @@ export default function App() {
     );
   }
 
-  // Capture view (simplified for now)
+  // Capture view
   if (currentTab === "capture") {
     return (
-      <div className="min-h-screen bg-slate-100">
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center p-6">
-            <Mic className="w-12 h-12 mx-auto mb-4 text-slate-900" />
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Quick Capture</h1>
-            <p className="text-slate-600 mb-6">Voice task entry and quick notes coming soon</p>
-            <button onClick={() => openNewTask(true)} className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-medium text-white hover:bg-slate-800">
-              <Mic className="h-4 w-4" />
-              Voice Task
-            </button>
-          </div>
-        </div>
+      <>
+        <Capture
+          onVoiceTaskStart={() => openNewTask(true)}
+          recentTasks={recentTasks}
+          onTaskClick={openEditTask}
+          onNewTask={() => openNewTask(false)}
+        />
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
           <div className="grid grid-cols-3 gap-2">
             <button onClick={() => setCurrentTab("tasks")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-medium text-slate-700 transition">
@@ -1042,7 +1047,7 @@ export default function App() {
           </div>
         </div>
         {showForm ? <TaskForm initialValue={editingTask} autoStartVoice={voiceStartRequested} onClose={() => { setShowForm(false); setEditingTask(null); setVoiceStartRequested(false); }} onSave={handleSaveTask} onDelete={handleDeleteTask} /> : null}
-      </div>
+      </>
     );
   }
 
