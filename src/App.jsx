@@ -29,7 +29,9 @@ import {
   ChevronDown,
   ChevronUp,
   Mic,
-  MicOff
+  MicOff,
+  Calendar,
+  Layout
 } from "lucide-react";
 import {
   WORKSPACE,
@@ -48,6 +50,7 @@ import {
   writeLocalTasks,
   parseVoiceTask
 } from "./lib/taskUtils.js";
+import Planner from "./components/Planner.jsx";
 
 const ownerStyles = {
   Dale: { chip: "bg-sky-100 text-sky-700 border-sky-200" },
@@ -68,6 +71,7 @@ const priorityMeta = {
   High: "bg-rose-100 text-rose-700 border-rose-200"
 };
 
+// Component definitions (unchanged from original, kept for backwards compatibility)
 function EmptyState({ onAdd }) {
   return (
     <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
@@ -159,6 +163,12 @@ function SetupPanel({ open, onToggle, config, onConfigChange, onSaveConfig, sync
   status text not null default 'To Do',
   priority text not null default 'Medium',
   due_date date,
+  start_time time,
+  end_time time,
+  all_day boolean default false,
+  location text,
+  task_type text,
+  show_on_calendar boolean default true,
   notes text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -222,11 +232,11 @@ exception when duplicate_object then null; end $$;`;
               <div className="grid gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Supabase project URL</label>
-                  <input value={config.supabaseUrl} onChange={(e) => onConfigChange("supabaseUrl", e.target.value)} placeholder="https://your-project.supabase.co" className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900" />
+                  <input value={config.supabaseUrl} onChange={(e) => onConfigChange("supabaseUrl", e.target.value)} placeholder="https://your-project.supabase.co" className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 outline-none transition focus:border-slate-900" />
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Supabase anon key</label>
-                  <textarea value={config.supabaseAnonKey} onChange={(e) => onConfigChange("supabaseAnonKey", e.target.value)} placeholder="Paste anon public key" rows={4} className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900" />
+                  <textarea value={config.supabaseAnonKey} onChange={(e) => onConfigChange("supabaseAnonKey", e.target.value)} placeholder="Paste anon public key" rows={4} className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 outline-none transition focus:border-slate-900 resize-none" />
                 </div>
               </div>
 
@@ -285,6 +295,12 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
       status: "To Do",
       priority: "Medium",
       due_date: "",
+      start_time: "",
+      end_time: "",
+      all_day: false,
+      location: "",
+      task_type: "task",
+      show_on_calendar: true,
       notes: "",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -544,6 +560,38 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Start time</label>
+                  <input
+                    type="time"
+                    value={form.start_time}
+                    onChange={(e) => updateField("start_time", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">End time</label>
+                  <input
+                    type="time"
+                    value={form.end_time}
+                    onChange={(e) => updateField("end_time", e.target.value)}
+                    className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="all_day"
+                  checked={form.all_day}
+                  onChange={(e) => updateField("all_day", e.target.checked)}
+                  className="rounded border-slate-300"
+                />
+                <label htmlFor="all_day" className="text-sm font-medium text-slate-700">All day</label>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Status</label>
                   <select
                     value={form.status}
@@ -567,6 +615,16 @@ function TaskForm({ initialValue, onClose, onSave, onDelete, autoStartVoice = fa
                     <option>High</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Location</label>
+                <input
+                  value={form.location}
+                  onChange={(e) => updateField("location", e.target.value)}
+                  placeholder="Where should this happen?"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-2.5 text-base outline-none transition focus:border-slate-900"
+                />
               </div>
 
               <div>
@@ -625,7 +683,7 @@ function TaskCard({ task, onEdit, onQuickStatus }) {
   const isOverdue = task.status !== "Done" && days !== null && days < 0;
 
   return (
-    <motion.button layout onClick={() => onEdit(task)} className={classNames("w-full rounded-[28px] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md", isOverdue && "border-rose-200 bg-rose-50")}>
+    <motion.button layout onClick={() => onEdit(task)} className={classNames("w-full rounded-[28px] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md", isOverdue ? "border-rose-200 bg-rose-50" : "border-slate-200")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -731,6 +789,8 @@ export default function App() {
   const [seeding, setSeeding] = useState(false);
   const [syncMessage, setSyncMessage] = useState("The app starts in local mode so it still works even if Supabase is not available.");
   const [voiceStartRequested, setVoiceStartRequested] = useState(false);
+  const [currentTab, setCurrentTab] = useState("tasks"); // "tasks", "planner", "capture"
+  const [selectedPlannerDate, setSelectedPlannerDate] = useState(new Date());
   const supabaseRef = useRef(null);
   const channelRef = useRef(null);
   const clientFactoryRef = useRef(null);
@@ -820,7 +880,7 @@ export default function App() {
 
   async function pushTaskToCloud(task) {
     if (!supabaseRef.current) return;
-    const payload = { id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "" };
+    const payload = { id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, start_time: task.start_time || null, end_time: task.end_time || null, all_day: task.all_day || false, location: task.location || null, task_type: task.task_type || "task", show_on_calendar: task.show_on_calendar !== false, notes: task.notes || "" };
     const { error } = await supabaseRef.current.from("tasks").upsert(payload);
     if (error) throw error;
   }
@@ -835,7 +895,7 @@ export default function App() {
     if (!supabaseRef.current) { setSyncMessage("Connect to Supabase first, then seed the cloud with current tasks."); return; }
     try {
       setSeeding(true);
-      const payload = tasks.map((task) => ({ id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, notes: task.notes || "" }));
+      const payload = tasks.map((task) => ({ id: task.id, workspace: WORKSPACE, title: task.title, owner: task.owner, status: task.status, priority: task.priority, due_date: task.due_date || null, start_time: task.start_time || null, end_time: task.end_time || null, all_day: task.all_day || false, location: task.location || null, task_type: task.task_type || "task", show_on_calendar: task.show_on_calendar !== false, notes: task.notes || "" }));
       const { error } = await supabaseRef.current.from("tasks").upsert(payload);
       if (error) throw error;
       setSyncMessage("Cloud seed completed.");
@@ -916,16 +976,87 @@ export default function App() {
     return { overdue, today, open, done };
   }, [tasks]);
 
+  // Planner view
+  if (currentTab === "planner") {
+    return (
+      <>
+        <Planner
+          tasks={tasks}
+          selectedDate={selectedPlannerDate}
+          onDateSelect={setSelectedPlannerDate}
+          onEdit={openEditTask}
+          onDelete={handleDeleteTask}
+          onStatusChange={handleQuickStatus}
+          onNewTask={() => openNewTask(false)}
+        />
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => setCurrentTab("tasks")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-medium text-slate-700 transition">
+              <Filter className="h-4 w-4" />
+              Tasks
+            </button>
+            <button onClick={() => setCurrentTab("planner")} className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-xs font-medium text-white">
+              <Calendar className="h-4 w-4" />
+              Planner
+            </button>
+            <button onClick={() => setCurrentTab("capture")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-medium text-slate-700 transition">
+              <Mic className="h-4 w-4" />
+              Capture
+            </button>
+          </div>
+        </div>
+        {showForm ? <TaskForm initialValue={editingTask} autoStartVoice={voiceStartRequested} onClose={() => { setShowForm(false); setEditingTask(null); setVoiceStartRequested(false); }} onSave={handleSaveTask} onDelete={handleDeleteTask} /> : null}
+      </>
+    );
+  }
+
+  // Capture view (simplified for now)
+  if (currentTab === "capture") {
+    return (
+      <div className="min-h-screen bg-slate-100">
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center p-6">
+            <Mic className="w-12 h-12 mx-auto mb-4 text-slate-900" />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Quick Capture</h1>
+            <p className="text-slate-600 mb-6">Voice task entry and quick notes coming soon</p>
+            <button onClick={() => openNewTask(true)} className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-medium text-white hover:bg-slate-800">
+              <Mic className="h-4 w-4" />
+              Voice Task
+            </button>
+          </div>
+        </div>
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => setCurrentTab("tasks")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-medium text-slate-700 transition">
+              <Filter className="h-4 w-4" />
+              Tasks
+            </button>
+            <button onClick={() => setCurrentTab("planner")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-medium text-slate-700 transition">
+              <Calendar className="h-4 w-4" />
+              Planner
+            </button>
+            <button onClick={() => setCurrentTab("capture")} className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-xs font-medium text-white">
+              <Mic className="h-4 w-4" />
+              Capture
+            </button>
+          </div>
+        </div>
+        {showForm ? <TaskForm initialValue={editingTask} autoStartVoice={voiceStartRequested} onClose={() => { setShowForm(false); setEditingTask(null); setVoiceStartRequested(false); }} onSave={handleSaveTask} onDelete={handleDeleteTask} /> : null}
+      </div>
+    );
+  }
+
+  // Tasks view (default)
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 pb-28 pt-5 sm:px-6 lg:px-8">
         <div className="mb-5 overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-xl">
-          <div className="bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)] px-5 py-6 sm:px-6">
+          <div className="bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)] px-5 py-6 sm:px-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-300">Shared mobile app</p>
                 <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">LavTask</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">Built as a cleaner mobile task app with local-first behaviour, optional cloud sync, quick edits, and ownership tracking for Dale, Mick, and Mark.</p>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">Built as a cleaner mobile task app with local-first behaviour, optional cloud sync, quick edits, and ownership tracking for Dale and Mick.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <div className={classNames("inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium", syncEnabled ? "bg-emerald-500/20 text-emerald-100" : "bg-white/10 text-slate-300")}>
@@ -941,6 +1072,43 @@ export default function App() {
                   New task
                 </button>
               </div>
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden sm:mt-6 sm:flex sm:gap-4 sm:border-t sm:border-white/20 sm:pt-4">
+              <button
+                onClick={() => setCurrentTab("tasks")}
+                className={classNames(
+                  "px-4 py-2 rounded-lg font-medium transition",
+                  currentTab === "tasks"
+                    ? "bg-white text-slate-900"
+                    : "text-slate-300 hover:text-white"
+                )}
+              >
+                Tasks
+              </button>
+              <button
+                onClick={() => setCurrentTab("planner")}
+                className={classNames(
+                  "px-4 py-2 rounded-lg font-medium transition",
+                  currentTab === "planner"
+                    ? "bg-white text-slate-900"
+                    : "text-slate-300 hover:text-white"
+                )}
+              >
+                Planner
+              </button>
+              <button
+                onClick={() => setCurrentTab("capture")}
+                className={classNames(
+                  "px-4 py-2 rounded-lg font-medium transition",
+                  currentTab === "capture"
+                    ? "bg-white text-slate-900"
+                    : "text-slate-300 hover:text-white"
+                )}
+              >
+                Capture
+              </button>
             </div>
           </div>
         </div>
@@ -1000,7 +1168,7 @@ export default function App() {
             </div>
 
             <AnimatePresence mode="popLayout">
-              {filteredTasks.length ? filteredTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onQuickStatus={handleQuickStatus} />) : <EmptyState onAdd={() => openNewTask()} />}
+              {filteredTasks.length ? filteredTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onQuickStatus={handleQuickStatus} />) : <EmptyState onAdd={() => openNewTask(false)} />}
             </AnimatePresence>
           </div>
 
@@ -1030,9 +1198,9 @@ export default function App() {
             <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900">Useful touches built in</h3>
               <div className="mt-4 space-y-3 text-sm text-slate-600">
-                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><StickyNote className="mt-0.5 h-4 w-4 text-slate-500" /><p>Every task includes notes for materials, access times, and follow-ups.</p></div>
+                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><StickyNote className="mt-0.5 h-4 w-4 text-slate-500" /><p>Every task includes notes for materials, access times, and special instructions.</p></div>
                 <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><CalendarDays className="mt-0.5 h-4 w-4 text-slate-500" /><p>Due dates automatically show what is due today, upcoming, or overdue.</p></div>
-                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><RefreshCw className="mt-0.5 h-4 w-4 text-slate-500" /><p>The app runs in local mode first, so Supabase problems don't block your workflow.</p></div>
+                <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-3"><RefreshCw className="mt-0.5 h-4 w-4 text-slate-500" /><p>The app runs in local mode first, so Supabase problems won't stop your workflow.</p></div>
               </div>
             </div>
           </div>
@@ -1040,14 +1208,18 @@ export default function App() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => openNewTask(true)} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm font-medium text-slate-700">
-            <Mic className="h-4 w-4" />
-            Voice task
+        <div className="grid grid-cols-3 gap-2">
+          <button onClick={() => setCurrentTab("tasks")} className={classNames("flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3.5 text-xs font-medium transition", currentTab === "tasks" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-700")}>
+            <Filter className="h-4 w-4" />
+            Tasks
           </button>
-          <button onClick={() => openNewTask(false)} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3.5 text-sm font-medium text-white">
-            <Plus className="h-4 w-4" />
-            Add task
+          <button onClick={() => setCurrentTab("planner")} className={classNames("flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3.5 text-xs font-medium transition", currentTab === "planner" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-700")}>
+            <Calendar className="h-4 w-4" />
+            Planner
+          </button>
+          <button onClick={() => setCurrentTab("capture")} className={classNames("flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3.5 text-xs font-medium transition", currentTab === "capture" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-700")}>
+            <Mic className="h-4 w-4" />
+            Capture
           </button>
         </div>
       </div>
