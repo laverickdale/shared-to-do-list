@@ -1147,7 +1147,7 @@ export default function App() {
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search tasks or notes" className="w-full rounded-2xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-base outline-none transition focus:border-slate-900" />
             </div>
-            <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={ownerFilter} onChange={setOwnerFilter} options={["All", "Dale", "Mick", "Mark"]} /></div>
+            <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={ownerFilter} onChange={setOwnerFilter} options={["All", "Dale", "Mick", "Mark", "Kayl"]} /></div>
             <div className="rounded-2xl border border-slate-200 p-1"><SegmentedControl value={statusFilter} onChange={setStatusFilter} options={["All", "To Do", "In Progress", "Done"]} /></div>
             <div className="flex items-center gap-2 rounded-2xl border border-slate-300 px-3 py-3 text-sm text-slate-600">
               <ArrowUpDown className="h-4 w-4" />
