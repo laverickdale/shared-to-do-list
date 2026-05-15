@@ -31,12 +31,12 @@ const ownerColors = {
     text: "text-green-700",
     pill: "bg-green-100 text-green-700",
   },
-  Kayl: {
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    text: "text-emerald-700",
-    pill: "bg-emerald-100 text-emerald-700",
-  },
+Kayl: {
+  bg: "bg-purple-50",
+  border: "border-purple-200",
+  text: "text-purple-700",
+  pill: "bg-purple-100 text-purple-700",
+},
   Unassigned: {
     bg: "bg-slate-50",
     border: "border-slate-200",
