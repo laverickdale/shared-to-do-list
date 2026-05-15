@@ -68,14 +68,17 @@ export function getDaysLeft(value) {
   const today = new Date();
   const due = new Date(`${value}T12:00:00`);
   if (Number.isNaN(due.getTime())) return null;
+
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const startOfDue = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+
   return Math.round((startOfDue - startOfToday) / 86400000);
 }
 
 export function dueLabel(value, status) {
   if (!value) return "No due date";
   if (status === "Done") return `Done · due ${formatDate(value)}`;
+
   const days = getDaysLeft(value);
   if (days === null) return "No due date";
   if (days === 0) return "Due today";
@@ -87,6 +90,7 @@ export function dueLabel(value, status) {
 
 export function sortTasks(tasks, mode) {
   const sorted = [...tasks];
+
   if (mode === "due") {
     return sorted.sort((a, b) => {
       if (!a.due_date) return 1;
@@ -94,20 +98,25 @@ export function sortTasks(tasks, mode) {
       return a.due_date.localeCompare(b.due_date);
     });
   }
+
   if (mode === "priority") {
     const order = { High: 0, Medium: 1, Low: 2 };
     return sorted.sort((a, b) => (order[a.priority] ?? 999) - (order[b.priority] ?? 999));
   }
+
   if (mode === "owner") {
     return sorted.sort((a, b) => (a.owner || "").localeCompare(b.owner || ""));
   }
+
   return sorted.sort(
-    (a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)
+    (a, b) =>
+      new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)
   );
 }
 
 export function readLocalTasks() {
   if (typeof window === "undefined") return makeStarterTasks();
+
   try {
     const raw = window.localStorage.getItem(LOCAL_TASKS_KEY);
     if (!raw) {
@@ -115,8 +124,10 @@ export function readLocalTasks() {
       window.localStorage.setItem(LOCAL_TASKS_KEY, JSON.stringify(starter));
       return starter;
     }
+
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length) return parsed;
+
     const starter = makeStarterTasks();
     window.localStorage.setItem(LOCAL_TASKS_KEY, JSON.stringify(starter));
     return starter;
@@ -137,10 +148,15 @@ export function writeLocalTasks(tasks) {
 export function readLocalConfig() {
   const envUrl = import.meta?.env?.VITE_SUPABASE_URL || "";
   const envKey = import.meta?.env?.VITE_SUPABASE_ANON_KEY || "";
-  if (typeof window === "undefined") return { supabaseUrl: envUrl, supabaseAnonKey: envKey };
+
+  if (typeof window === "undefined") {
+    return { supabaseUrl: envUrl, supabaseAnonKey: envKey };
+  }
+
   try {
     const raw = window.localStorage.getItem(LOCAL_CONFIG_KEY);
     if (!raw) return { supabaseUrl: envUrl, supabaseAnonKey: envKey };
+
     const parsed = JSON.parse(raw);
     return {
       supabaseUrl: parsed.supabaseUrl || envUrl,
@@ -176,10 +192,18 @@ export function mapRow(row) {
 }
 
 export function validateSupabaseConfig(url, key) {
-  if (!url.trim() && !key.trim()) return { ok: false, message: "Enter a Supabase project URL and anon key first." };
-  if (!url.trim()) return { ok: false, message: "Enter your Supabase project URL." };
-  if (!key.trim()) return { ok: false, message: "Enter your Supabase anon key." };
-  if (!/^https:\/\//i.test(url.trim())) return { ok: false, message: "The Supabase URL should start with https://" };
+  if (!url.trim() && !key.trim()) {
+    return { ok: false, message: "Enter a Supabase project URL and anon key first." };
+  }
+  if (!url.trim()) {
+    return { ok: false, message: "Enter your Supabase project URL." };
+  }
+  if (!key.trim()) {
+    return { ok: false, message: "Enter your Supabase anon key." };
+  }
+  if (!/^https:\/\//i.test(url.trim())) {
+    return { ok: false, message: "The Supabase URL should start with https://" };
+  }
   return { ok: true, message: "" };
 }
 
@@ -187,10 +211,12 @@ export function getNextWeekdayDate(dayName) {
   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   const targetIndex = days.indexOf(dayName.toLowerCase());
   if (targetIndex === -1) return "";
+
   const now = new Date();
   const currentIndex = now.getDay();
   let diff = targetIndex - currentIndex;
   if (diff <= 0) diff += 7;
+
   const next = new Date(now);
   next.setDate(now.getDate() + diff);
   return next.toISOString().slice(0, 10);
@@ -198,42 +224,82 @@ export function getNextWeekdayDate(dayName) {
 
 export function extractVoiceDate(text) {
   const lower = text.toLowerCase();
+
   if (/\btoday\b/.test(lower)) {
-    return { due_date: inDays(0), cleaned: text.replace(/\btoday\b/gi, "").trim() };
+    return {
+      due_date: inDays(0),
+      cleaned: text.replace(/\btoday\b/gi, "").trim(),
+    };
   }
+
   if (/\btomorrow\b/.test(lower)) {
-    return { due_date: inDays(1), cleaned: text.replace(/\btomorrow\b/gi, "").trim() };
+    return {
+      due_date: inDays(1),
+      cleaned: text.replace(/\btomorrow\b/gi, "").trim(),
+    };
   }
-  const weekdayMatch = lower.match(/\b(?:on\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/);
+
+  const weekdayMatch = lower.match(
+    /\b(?:on\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/
+  );
+
   if (weekdayMatch) {
     return {
       due_date: getNextWeekdayDate(weekdayMatch[1]),
       cleaned: text.replace(new RegExp(`\\b(?:on\\s+)?${weekdayMatch[1]}\\b`, "i"), "").trim(),
     };
   }
+
   return { due_date: "", cleaned: text.trim() };
 }
 
 export function extractVoiceOwner(text, currentOwner = "Dale") {
   if (/\bassign to mick\b|\bfor mick\b/i.test(text)) {
-    return { owner: "Mick", cleaned: text.replace(/\bassign to mick\b|\bfor mick\b/gi, "").trim() };
+    return {
+      owner: "Mick",
+      cleaned: text.replace(/\bassign to mick\b|\bfor mick\b/gi, "").trim(),
+    };
   }
+
   if (/\bassign to dale\b|\bfor dale\b/i.test(text)) {
-    return { owner: "Dale", cleaned: text.replace(/\bassign to dale\b|\bfor dale\b/gi, "").trim() };
+    return {
+      owner: "Dale",
+      cleaned: text.replace(/\bassign to dale\b|\bfor dale\b/gi, "").trim(),
+    };
   }
+
+  if (/\bassign to kayl\b|\bfor kayl\b/i.test(text)) {
+    return {
+      owner: "Kayl",
+      cleaned: text.replace(/\bassign to kayl\b|\bfor kayl\b/gi, "").trim(),
+    };
+  }
+
   return { owner: currentOwner, cleaned: text.trim() };
 }
 
 export function extractVoicePriority(text, currentPriority = "Medium") {
   if (/\bhigh priority\b|\burgent\b/i.test(text)) {
-    return { priority: "High", cleaned: text.replace(/\bhigh priority\b|\burgent\b/gi, "").trim() };
+    return {
+      priority: "High",
+      cleaned: text.replace(/\bhigh priority\b|\burgent\b/gi, "").trim(),
+    };
   }
+
   if (/\blow priority\b/i.test(text)) {
-    return { priority: "Low", cleaned: text.replace(/\blow priority\b/gi, "").trim() };
+    return {
+      priority: "Low",
+      cleaned: text.replace(/\blow priority\b/gi, "").trim(),
+    };
   }
+
   if (/\bmedium priority\b/i.test(text)) {
-    return { priority: "Medium", cleaned: text.replace(/\bmedium priority\b/gi, "").trim() };
+    return {
+      priority: "Medium",
+      cleaned: text.replace(/\bmedium priority\b/gi, "").trim(),
+    };
   }
+
   return { priority: currentPriority, cleaned: text.trim() };
 }
 
@@ -244,18 +310,25 @@ export function cleanVoiceTitle(text) {
 export function parseVoiceTask(transcript, currentForm) {
   const original = transcript.trim();
   let working = original;
+
   const ownerInfo = extractVoiceOwner(working, currentForm.owner);
   working = ownerInfo.cleaned;
+
   const dateInfo = extractVoiceDate(working);
   working = dateInfo.cleaned;
+
   const priorityInfo = extractVoicePriority(working, currentForm.priority);
   working = priorityInfo.cleaned;
+
   const title = cleanVoiceTitle(working) || original;
+
   return {
     title,
     owner: ownerInfo.owner,
     due_date: dateInfo.due_date || currentForm.due_date,
     priority: priorityInfo.priority,
-    notes: currentForm.notes ? `${currentForm.notes}\n\nVoice note: ${original}` : `Voice note: ${original}`,
+    notes: currentForm.notes
+      ? `${currentForm.notes}\n\nVoice note: ${original}`
+      : `Voice note: ${original}`,
   };
 }
