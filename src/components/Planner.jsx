@@ -49,7 +49,7 @@ function PlannerDetailPanel({ task, onClose, onEdit, onStatusChange, isVisible }
   if (!task || !isVisible) return null;
 
   const statusOptions = ["To Do", "In Progress", "Done"];
-  const currentAssigned toColor = Assigned toColors[task.Assigned to] || Assigned toColors.Unassigned;
+  const currentOwnerColor = ownerColors[task.owner] || ownerColors.Unassigned;
   const daysLeft = getDaysLeft(task.due_date);
   const isOverdue = task.status !== "Done" && daysLeft !== null && daysLeft < 0;
 
@@ -82,11 +82,11 @@ function PlannerDetailPanel({ task, onClose, onEdit, onStatusChange, isVisible }
           <span
             className={classNames(
               "inline-flex rounded-full px-3 py-1 text-sm font-medium",
-              currentAssigned toColor.pill
+              currentOwnerColor.pill
             )}
           >
             <User className="mr-2 h-4 w-4" />
-            {task.Assigned to}
+            {task.owner}
           </span>
         </div>
 
@@ -261,8 +261,8 @@ function MiniCalendar({ selectedDate, onDateSelect }) {
               day === null
                 ? "cursor-default"
                 : isSelected(day)
-                ? "bg-slate-900 text-white"
-                : "text-slate-700 hover:bg-slate-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
             )}
           >
             {day}
@@ -381,9 +381,15 @@ function WeekView({ tasks, selectedDate, onTaskClick }) {
 
 function TodayView({ tasks, onTaskClick, onNewTask }) {
   const today = new Date().toISOString().split("T")[0];
-  const todayTasks = tasks.filter((task) => task.due_date === today && task.show_on_calendar !== false);
+  const todayTasks = tasks.filter(
+    (task) => task.due_date === today && task.show_on_calendar !== false
+  );
   const overdueTasks = tasks.filter(
-    (task) => task.status !== "Done" && task.due_date && task.due_date < today && task.show_on_calendar !== false
+    (task) =>
+      task.status !== "Done" &&
+      task.due_date &&
+      task.due_date < today &&
+      task.show_on_calendar !== false
   );
 
   return (
@@ -540,6 +546,7 @@ export default function Planner({
             {view === "today" ? (
               <TodayView tasks={tasks} onTaskClick={setSelectedTask} onNewTask={onNewTask} />
             ) : null}
+
             {view === "week" ? (
               <WeekView tasks={tasks} selectedDate={selectedDate} onTaskClick={setSelectedTask} />
             ) : null}
