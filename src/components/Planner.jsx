@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { getDaysLeft, formatDate, classNames } from "../lib/taskUtils.js";
 
-const ownerColors = {
+const Assigned toColors = {
   Dale: {
     bg: "bg-sky-50",
     border: "border-sky-200",
@@ -49,7 +49,7 @@ function PlannerDetailPanel({ task, onClose, onEdit, onStatusChange, isVisible }
   if (!task || !isVisible) return null;
 
   const statusOptions = ["To Do", "In Progress", "Done"];
-  const currentOwnerColor = ownerColors[task.owner] || ownerColors.Unassigned;
+  const currentAssigned toColor = Assigned toColors[task.Assigned to] || Assigned toColors.Unassigned;
   const daysLeft = getDaysLeft(task.due_date);
   const isOverdue = task.status !== "Done" && daysLeft !== null && daysLeft < 0;
 
@@ -77,16 +77,16 @@ function PlannerDetailPanel({ task, onClose, onEdit, onStatusChange, isVisible }
       <div className="space-y-4">
         <div className="rounded-2xl bg-slate-50 p-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Owner
+            Assigned to
           </p>
           <span
             className={classNames(
               "inline-flex rounded-full px-3 py-1 text-sm font-medium",
-              currentOwnerColor.pill
+              currentAssigned toColor.pill
             )}
           >
             <User className="mr-2 h-4 w-4" />
-            {task.owner}
+            {task.Assigned to}
           </span>
         </div>
 
