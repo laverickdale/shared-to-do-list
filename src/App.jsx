@@ -1183,24 +1183,54 @@ export default function App() {
             <SetupPanel open={setupOpen} onToggle={() => setSetupOpen((current) => !current)} config={config} onConfigChange={updateConfigField} onSaveConfig={handleSaveConfig} syncEnabled={syncEnabled} connectionState={connectionState} onSeedCloud={seedCloudWithCurrentTasks} seeding={seeding} syncMessage={syncMessage} />
             <DebugPanel results={selfTestResults} />
 
-            <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900">Team guide</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-500">Colour coding makes responsibility obvious at a glance.</p>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between rounded-2xl bg-sky-50 px-4 py-3">
-                  <div><p className="font-medium text-slate-900">Dale</p><p className="text-sm text-slate-600">Blue owner tags</p></div>
-                  <span className="rounded-full bg-sky-600 px-3 py-1 text-xs font-medium text-white">Owner</span>
-                </div>
-                <div className="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
-                  <div><p className="font-medium text-slate-900">Mick</p><p className="text-sm text-slate-600">Amber owner tags</p></div>
-                  <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white">Owner</span>
-                </div>
-                <div className="flex items-center justify-between rounded-2xl bg-green-50 px-4 py-3">
-                  <div><p className="font-medium text-slate-900">Mark</p><p className="text-sm text-slate-600">Green owner tags</p></div>
-                  <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-medium text-white">Owner</span>
-                </div>
-              </div>
-            </div>
+           <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
+  <h3 className="text-lg font-semibold text-slate-900">Team guide</h3>
+  <p className="mt-1 text-sm leading-6 text-slate-500">
+    Colour coding makes responsibility obvious at a glance.
+  </p>
+
+  <div className="mt-4 space-y-3">
+    <div className="flex items-center justify-between rounded-2xl bg-sky-50 px-4 py-3">
+      <div>
+        <p className="font-medium text-slate-900">Dale</p>
+        <p className="text-sm text-slate-600">Blue assigned tags</p>
+      </div>
+      <span className="rounded-full bg-sky-600 px-3 py-1 text-xs font-medium text-white">
+        Assigned
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
+      <div>
+        <p className="font-medium text-slate-900">Mick</p>
+        <p className="text-sm text-slate-600">Amber assigned tags</p>
+      </div>
+      <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white">
+        Assigned
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between rounded-2xl bg-green-50 px-4 py-3">
+      <div>
+        <p className="font-medium text-slate-900">Mark</p>
+        <p className="text-sm text-slate-600">Green assigned tags</p>
+      </div>
+      <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-medium text-white">
+        Assigned
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
+      <div>
+        <p className="font-medium text-slate-900">Kayl</p>
+        <p className="text-sm text-slate-600">Emerald assigned tags</p>
+      </div>
+      <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
+        Admin
+      </span>
+    </div>
+  </div>
+</div>
 
             <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900">Useful touches built in</h3>
