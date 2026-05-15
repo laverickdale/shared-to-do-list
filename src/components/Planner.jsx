@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { getDaysLeft, formatDate, classNames } from "../lib/taskUtils.js";
 
-const Assigned toColors = {
+const ownerColors = {
   Dale: {
     bg: "bg-sky-50",
     border: "border-sky-200",
