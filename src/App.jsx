@@ -1184,7 +1184,7 @@ export default function App() {
             <DebugPanel results={selfTestResults} />
 
             <div className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900">Owner guide</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Team guide</h3>
               <p className="mt-1 text-sm leading-6 text-slate-500">Colour coding makes responsibility obvious at a glance.</p>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between rounded-2xl bg-sky-50 px-4 py-3">
