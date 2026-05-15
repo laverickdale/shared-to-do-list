@@ -1154,7 +1154,7 @@ export default function App() {
               <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="w-full bg-transparent outline-none">
                 <option value="due">Sort: Due date</option>
                 <option value="priority">Sort: Priority</option>
-                <option value="owner">Sort: Owner</option>
+                <option value="owner">Sort: Assigned to</option>
                 <option value="newest">Sort: Recently updated</option>
               </select>
             </div>
