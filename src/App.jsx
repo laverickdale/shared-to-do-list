@@ -56,7 +56,8 @@ import Capture from "./components/Capture.jsx";
 const ownerStyles = {
   Dale: { chip: "bg-sky-100 text-sky-700 border-sky-200" },
   Mick: { chip: "bg-amber-100 text-amber-700 border-amber-200" },
-  Mark: { chip: "bg-green-100 text-green-700 border-green-200" },
+ Mark: { chip: "bg-green-100 text-green-700 border-green-200" },
+Kayl: { chip: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   Unassigned: { chip: "bg-slate-100 text-slate-700 border-slate-200" }
 };
 
