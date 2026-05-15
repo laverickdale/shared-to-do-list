@@ -1220,12 +1220,12 @@ export default function App() {
       </span>
     </div>
 
-    <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
-      <div>
-        <p className="font-medium text-slate-900">Kayl</p>
-        <p className="text-sm text-slate-600">Emerald assigned tags</p>
-      </div>
-      <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
+   <div className="flex items-center justify-between rounded-2xl bg-purple-50 px-4 py-3">
+  <div>
+    <p className="font-medium text-slate-900">Kayl</p>
+    <p className="text-sm text-slate-600">Purple assigned tags</p>
+  </div>
+  <span className="rounded-full bg-purple-600 px-3 py-1 text-xs font-medium text-white">
         Assigned
       </span>
     </div>
