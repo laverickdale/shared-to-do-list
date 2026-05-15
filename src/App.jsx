@@ -1226,7 +1226,7 @@ export default function App() {
         <p className="text-sm text-slate-600">Emerald assigned tags</p>
       </div>
       <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
-        Admin
+        Assigned
       </span>
     </div>
   </div>
